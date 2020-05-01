@@ -1,0 +1,30 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: tasks/main.yml
+
+- name: "Get guest VirtualBox version"
+  shell: (/usr/bin/VBoxControl --version || echo 0r0) | cut -d 'r' -f1
+  changed_when: False
+  register: virtualbox_guest_version
+
+- name: "Get host VirtualBox version"
+  become: False
+  delegate_to: localhost
+  shell: /usr/bin/VBoxManage --version | cut -d 'r' -f1
+  changed_when: False
+  register: virtualbox_host_version
+
+- name: "Create VirtualBox version file"
+  lineinfile:
+    dest: "{{ ansible_user_dir }}/.vbox_version"
+    regexp: "^{{ virtualbox_host_version.stdout }}"
+    line: "{{ virtualbox_host_version.stdout }}"
+    create: yes
+    state: present
+
+# packer uploads this for you
+- name: "Get VirtualBox version"
+  shell: "cat {{ ansible_user_dir }}/.vbox_version"
+  changed_when: False
+  register: virtualbox_version
+  tags: ['skip_ansible_lint']

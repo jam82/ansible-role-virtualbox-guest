@@ -1,0 +1,7 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/Alpine.yml
+
+virtualbox_guest_packages:
+  - virtualbox-guest-additions
+  - virtualbox-guest-modules-virt

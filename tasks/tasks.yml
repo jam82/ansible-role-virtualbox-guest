@@ -1,0 +1,75 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: tasks/tasks.yml
+
+- name: "Set os_family dependent variables"
+  include_vars: '{{ ansible_os_family }}.yml'
+
+- name: "Set distribution dependent variables"
+  include_vars: '{{ vars_file }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'
+      skip: true
+  loop_control:
+    loop_var: vars_file
+
+- name: "Set fact for no-X11 option"
+  set_fact:
+    virtualbox_guest_nox11: "{{ (ansible_env.XDG_CURRENT_DESKTOP is defined) | ternary(False, True) }}"
+
+# On Debian and derivates kernel headers are not installed on update.
+# On Redhat correct kernel headers are not found, if system is not up-to-date.
+- name: "Upgrade packages on Debian/RedHat"
+  block:
+    - name: "Upgrade all packages"
+      package:
+        name: '*'
+        state: latest
+      register: package_update
+
+    - name: "Reboot the system to use newest kernel with corresponding headers"
+      reboot:
+        reboot_timeout: 300
+      when: package_update is changed
+  when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
+
+- name: Install packages for ansible-role-virtualbox-guest
+  package:
+    name: "{{ virtualbox_guest_packages }}"
+    state: present
+
+- name: "Include tasks for determining version of VirtualBox guest additions"
+  include_tasks: version.yml
+
+- name: "Include tasks for building VirtualBox guest additions"
+  include_tasks: build.yml
+  when: ansible_distribution != "Alpine" and ansible_distribution != "Archlinux"
+    and virtualbox_guest_version.stdout != virtualbox_host_version.stdout
+
+- name: "Delete VirtualBox guest additions and packer artifacts"
+  file:
+    path: "{{ item }}"
+    follow: yes
+    state: absent
+  loop:
+    - "{{ ansible_user_dir }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    - "{{ ansible_user_dir }}/.vbox_version"
+    - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
+    - "/opt/VBoxGuestAdditions-{{ virtualbox_version.stdout }}/src"
+    - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
+    - "/var/lib/dkms/vboxguest"
+    - "/var/log/vboxadd-install.log"
+    - "/var/log/vboxadd-install-x11.log"
+    - "/var/log/vboxadd-setup.log"
+    - "/var/log/VBoxGuestAdditions.log"
+    - "/var/log/VBoxGuestAdditions-uninstall.log"
+
+# This reboot does not always fire, because it does not make sense
+# during packer builds, e.g.
+- name: "Reboot the system to enable VirtualBox modules"
+  reboot:
+    reboot_timeout: 300
+  when: virtualbox_guest_reboot | bool

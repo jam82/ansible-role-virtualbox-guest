@@ -1,0 +1,12 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/RedHat.yml
+
+virtualbox_guest_packages:
+  - bzip2
+  - dkms
+  - elfutils-libelf-devel
+  - gcc
+  - kernel-headers
+  - kernel-devel
+  - make

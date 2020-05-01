@@ -1,0 +1,40 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: tasks/build.yml
+
+- name: "Create mountpoint"
+  file:
+    name: "/mnt/vbga"
+    state: directory
+    mode: 0755
+
+- name: "Check if VirtualBox ISO file exists"
+  stat:
+    path: "{{ ansible_user_dir }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+  register: virtualbox_iso_file
+
+- name: "Download ISO, when it does not exist"
+  get_url:
+    url: http://download.virtualbox.org/virtualbox/{{ virtualbox_version.stdout}}/VBoxGuestAdditions_{{virtualbox_version.stdout}}.iso
+    dest: "{{ ansible_user_dir }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+  when: not virtualbox_iso_file.stat.exists
+
+# packer uploads this for you
+- name: "Mount VirtualBox guest additions ISO"
+  mount:
+    name: "/mnt/vbga"
+    src: "{{ ansible_user_dir }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    opts: loop
+    state: mounted
+    fstype: iso9660
+
+- name: "Run VirtualBox guest additions installation"
+  shell: "echo yes | /mnt/vbga/VBoxLinuxAdditions.run {{ virtualbox_guest_nox11 | ternary('--nox11', '') }}"
+  register: virtualbox_build
+  failed_when: virtualbox_build.rc > 0 and virtualbox_build.rc != 2  # 2=old version not removed until reboot
+  tags: ['skip_ansible_lint']
+
+- name: "Unmount VirtualBox guest additions ISO"
+  mount:
+    name: "/mnt/vbga"
+    state: absent

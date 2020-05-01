@@ -1,0 +1,16 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/Debian.yml
+
+virtualbox_guest_packages:
+  - build-essential
+  - bzip2
+  - cryptsetup
+  - dkms
+  - gcc
+  - libreadline-dev
+  - libssl-dev
+  - "linux-headers-{{ ansible_kernel }}"
+  - make
+  - software-properties-common
+  - zlib1g-dev

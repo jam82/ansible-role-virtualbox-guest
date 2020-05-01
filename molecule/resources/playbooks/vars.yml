@@ -1,0 +1,6 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: molecule/resources/playbooks/vars.yml
+
+common_role_enabled: True
+virtualbox_guest_role_enabled: True

@@ -1,0 +1,6 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/Archlinux.yml
+
+virtualbox_guest_packages:
+  - "virtualbox-guest-utils{{ virtualbox_guest_nox11 | ternary('-nox', '') }}"

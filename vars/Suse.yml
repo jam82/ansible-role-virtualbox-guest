@@ -1,0 +1,10 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/Suse.yml
+
+virtualbox_guest_packages:
+  - bzip2
+  - dkms
+  - gcc
+  - kernel-source
+  - make

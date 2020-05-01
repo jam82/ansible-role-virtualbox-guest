@@ -1,0 +1,13 @@
+---
+# role: ansible-role-virtualbox-guest
+# file: vars/Fedora.yml
+
+virtualbox_guest_packages:
+  - bzip2
+  - dkms
+  - elfutils-libelf-devel
+  - gcc
+  - kernel-headers
+  - kernel-devel
+  - libxcrypt-compat
+  - make
