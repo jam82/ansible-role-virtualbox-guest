@@ -10,20 +10,20 @@
 
 - name: "Check if VirtualBox ISO file exists"
   stat:
-    path: "/home/{{ ansible_ssh_user }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    path: "{{ ansible_env.PWD }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
   register: virtualbox_iso_file
 
 - name: "Download ISO, when it does not exist"
   get_url:
     url: http://download.virtualbox.org/virtualbox/{{ virtualbox_version.stdout}}/VBoxGuestAdditions_{{virtualbox_version.stdout}}.iso
-    dest: "/home/{{ ansible_ssh_user }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    dest: "{{ ansible_env.PWD }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
   when: not virtualbox_iso_file.stat.exists
 
 # packer uploads this for you
 - name: "Mount VirtualBox guest additions ISO"
   mount:
     name: "/mnt/vbga"
-    src: "/home/{{ ansible_ssh_user }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    src: "{{ ansible_env.PWD }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
     opts: loop
     state: mounted
     fstype: iso9660

@@ -55,8 +55,24 @@
     follow: yes
     state: absent
   loop:
-    - "/home/{{ ansible_ssh_user }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
-    - "/home/{{ ansible_ssh_user }}/.vbox_version"
+    - "{{ ansible_env.PWD }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    - "{{ ansible_env.PWD }}/.vbox_version"
+    - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
+    - "/opt/VBoxGuestAdditions-{{ virtualbox_version.stdout }}/src"
+    - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
+    - "/var/lib/dkms/vboxguest"
+    - "/var/log/vboxadd-install.log"
+    - "/var/log/vboxadd-install-x11.log"
+    - "/var/log/vboxadd-setup.log"
+    - "/var/log/VBoxGuestAdditions.log"
+    - "/var/log/VBoxGuestAdditions-uninstall.log"
+
+- name: debug
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - "{{ ansible_env.HOME }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    - "{{ ansible_env.PWD }}/.vbox_version"
     - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
     - "/opt/VBoxGuestAdditions-{{ virtualbox_version.stdout }}/src"
     - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
