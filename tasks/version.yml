@@ -16,7 +16,7 @@
 
 - name: "Create VirtualBox version file"
   lineinfile:
-    dest: "{{ ansible_user_dir }}/.vbox_version"
+    dest: "/home/{{ ansible_ssh_user }}/.vbox_version"
     regexp: "^{{ virtualbox_host_version.stdout }}"
     line: "{{ virtualbox_host_version.stdout }}"
     create: yes
@@ -24,7 +24,7 @@
 
 # packer uploads this for you
 - name: "Get VirtualBox version"
-  shell: "cat {{ ansible_user_dir }}/.vbox_version"
+  shell: "cat /home/{{ ansible_ssh_user }}/.vbox_version"
   changed_when: False
   register: virtualbox_version
   tags: ['skip_ansible_lint']

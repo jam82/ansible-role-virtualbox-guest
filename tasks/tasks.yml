@@ -55,8 +55,8 @@
     follow: yes
     state: absent
   loop:
-    - "{{ ansible_user_dir }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
-    - "{{ ansible_user_dir }}/.vbox_version"
+    - "/home/{{ ansible_ssh_user }}/VBoxGuestAdditions_{{ virtualbox_version.stdout }}.iso"
+    - "/home/{{ ansible_ssh_user }}/.vbox_version"
     - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
     - "/opt/VBoxGuestAdditions-{{ virtualbox_version.stdout }}/src"
     - "/usr/src/vboxguest-{{ virtualbox_version.stdout }}"
